@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Topic Details</title>
+</head>
+<body>
+    <H2>{{ topic.name }}</H2>
+    <p> Category:{{ topic.category }}</p>
+    <H2>List of Courses</H2>
+    <ol>
+        {% for course in  course_list %}
+            <li>{{ course.name }} ${{ course.price }}</li>
+        {% endfor %}
+    </ol>
+</body>
+</html>
