@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -17,6 +19,13 @@ class Course(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     for_everyone = models.BooleanField(default=True)
     description = models.TextField(max_length=300, null=True, blank=True)
+    interested = models.PositiveIntegerField(default=0)
+    stages = models.PositiveIntegerField(default=3)
+
+    def discount(self):
+        #self.save()
+        return 0.9*self.price
+
 
     def __str__(self):
         return "{ Name: " + self.name + \
@@ -45,7 +54,7 @@ class Order(models.Model):
     levels = models.PositiveIntegerField(default=0)
     ORDER_CHOICES = [(0, 'Cancelled'), (1, 'Order Confirmed')]
     order_status = models.IntegerField(choices=ORDER_CHOICES, default=1)
-    order_date = models.DateField(auto_now_add=True, editable=False)
+    order_date = models.DateField(default=datetime.date.today)
 
     def total_cost(self):
         return sum(course.price for course in self.course.all())

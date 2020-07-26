@@ -1,5 +1,6 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 
+from .forms import OrderForm, InterestForm
 from .models import Topic, Course
 
 
@@ -28,3 +29,44 @@ def detail(request, top_no):
     #     response.write('<p>' + str(course.id) + ': ' + str(course) + for_str + '</p>')
     # return response
     return render(request, "myapp/detail.html", {'topic': topic, 'course_list': course_list})
+
+
+def courses(request):
+    courlist = Course.objects.all().order_by('id')
+    return render(request, 'myapp/courses.html', {'courlist': courlist})
+
+
+def place_order(request):
+    msg = ''
+    discount = 0
+    courlist = Course.objects.all()
+    if request.method == 'POST':
+        form = OrderForm(request.POST)
+        if form.is_valid():
+            order = form.save(commit=False)
+            if order.levels <= order.course.stages:
+                order.save()
+                msg = 'Your course has been ordered successfully.'
+                if order.course.price > 150:
+                    discount = order.course.discount()
+            else:
+                msg = 'You exceeded the number of levels for this course.'
+            return render(request, 'myapp/order_response.html', {'msg': msg, 'discount': discount})
+    else:
+        form = OrderForm()
+    return render(request, 'myapp/placeorder.html', {'form': form, 'msg': msg, 'courlist': courlist})
+
+
+def coursedetail(request, cour_id):
+    course = get_object_or_404(Course, pk=cour_id)
+    if request.method == 'POST':
+        form = InterestForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            if data['interested'] == 1:
+                course.interested += 1
+            course.save()
+            return redirect('myapp:index')
+    elif request.method == 'GET':
+        form = InterestForm()
+        return render(request, 'myapp/coursedetail.html/', {'form': form, 'course': course})

@@ -1,0 +1,15 @@
+{% extends 'myapp/base.html' %}
+{% block title %}Order Form{% endblock %}
+{% block body_block %}
+    <p>
+        Name:{{ course.name }}<br>
+        Price:{{ course.price }}<br>
+        This Course is {% if course.for_everyone %} For Everyone{% else %} Not For Everyone{% endif %}<br>
+        No# of people interested : {{ course.interested }}
+    </p>
+    <form action="{% url 'myapp:place_order' %}" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" value="Submit">
+    </form>
+{% endblock %}
